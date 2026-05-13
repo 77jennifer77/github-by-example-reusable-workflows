@@ -1,25 +1,67 @@
-name: Print Info
+name: Test
 
 on:
     workflow_call:
         inputs:
-            name:
-                required: true
+            docker-compose-command:
+                required: false
                 type: string
-                description: "The service name"
-        secrets:
-            docker-secret:
-                required: true
-
+                description: "Docker compose command"
+                default: |
+                    docker compose up -d
+            docker-compose-command-opts:
+                required: false
+                type: string
+                description: "Docker compose command options"
+                default: "-inMemory"
+            test-script:
+                required: false
+                type: string
+                description: "Test script"
+                default: |
+                    ./scripts/dynamodb/create-table.sh
+                    go test -v ./...
+            aws-region:
+                required: false
+                type: string
+                description: "AWS region"
+                default: "us-west-2"
+            dynamodb-local-endpoint:
+                required: false
+                type: string
+                description: "DynamoDB local endpoint"
+                default: "http://localhost:8000"
+            test-aws-access-key-id:
+                required: false
+                type: string
+                description: "AWS access key ID (for local testing, should not be a real access key ID)"
+                default: "test"
+            test-aws-secret-access-key:
+                required: false
+                type: string
+                description: "AWS secret access key (for local testing, should not be a real secret access key)"
+                default: "test"
 jobs:
-    print-passed-info:
+    test:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Print Name
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version-file: go.mod
+                  check-latest: true
+            - name: Docker Compose
               run: |
-                  echo The service is ${{ inputs.name }}
-            - name: Print Info
+                  ${{ inputs.docker-compose-command }}
+              env:
+                  DOCKER_COMPOSE_COMMAND_OPTS: ${{ inputs.docker-compose-command-opts }}
+            - name: Test
               run: |
-                  echo ${{ secrets.docker-secret }} this value does not show because it is a secret.
+                  ${{ inputs.test-script }}
+              env:
+                  AWS_ACCESS_KEY_ID: ${{ inputs.test-aws-access-key-id }}
+                  AWS_SECRET_ACCESS_KEY: ${{ inputs.test-aws-secret-access-key }}
+                  AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
+                  DYNAMODB_LOCAL_ENDPOINT: ${{ inputs.dynamodb-local-endpoint }}
