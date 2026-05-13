@@ -1,0 +1,25 @@
+name: Print Info
+
+on:
+    workflow_call:
+        inputs:
+            name:
+                required: true
+                type: string
+                description: "The service name"
+        secrets:
+            docker-secret:
+                required: true
+
+jobs:
+    print-passed-info:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Print Name
+              run: |
+                  echo The service is ${{ inputs.name }}
+            - name: Print Info
+              run: |
+                  echo ${{ secrets.docker-secret }} this value does not show because it is a secret.
