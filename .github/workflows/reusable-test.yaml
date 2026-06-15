@@ -1,4 +1,4 @@
-name: reusable test # here's a comment to test the reusable workflow
+name: reusable test # reusable workflow test
 
 on:
     workflow_call:
