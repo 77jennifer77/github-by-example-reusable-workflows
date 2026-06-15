@@ -65,12 +65,22 @@ jobs:
             changed="${changed_actions}"
           fi
           echo "Changed Workflows: $changed"
-          echo "values=${changed}" >> $GITHUB_OUTPUT
 
-          # Trim any leading/trailing spaces or newlines from the final result
-          trimmed_changed=$(echo "$changed" | jq -c .)
+          # Convert comma-separated string to JSON array format
+          # If empty, output empty array: []
+          # If "test", output: ["test"]
+          # If "test, test-build", output: ["test","test-build"]
+          if [ -z "$changed" ]; then
+            trimmed_changed="[]"
+          else
+            # -R: read input as raw string (not JSON)
+            # -c: compact output
+            # split(","): split by comma into array
+            # map(gsub(...)): trim whitespace from each element
+            trimmed_changed=$(echo "$changed" | jq -Rc 'split(",") | map(gsub("^\\s+|\\s+$";""))')
+          fi
 
-          echo "Changed Workflows: $trimmed_changed"
+          echo "Changed Workflows (JSON): $trimmed_changed"
           echo "values=$trimmed_changed" >> $GITHUB_OUTPUT
   release:
     runs-on: ubuntu-latest
