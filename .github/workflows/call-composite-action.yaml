@@ -1,0 +1,12 @@
+name: Call Composite Action Workflow # composite action is a reusable workflow, it needs to be called by a different workflow
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    call-composite-action:
+        uses: ./.github/workflows/composite-action.yaml
+        secrets: inherit
