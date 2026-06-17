@@ -1,4 +1,4 @@
-name: "get labels"
+name: "get labels" # updating the action file
 description: "Outputs a bump type based on the bump:<value> label"
 inputs:
   label-key:
