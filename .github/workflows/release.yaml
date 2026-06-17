@@ -6,13 +6,13 @@ on:
       - main
     paths:
       - ".github/workflows/reusable-**"
-      - ".github/actions**" # added triggers for composite-action
+      - ".github/actions/**" # added triggers for composite-action
     tags:
       - "*"
   pull_request:
     paths:
       - ".github/workflows/reusable-**"
-      - ".github/actions**"
+      - ".github/actions/**"
     types:
       - opened
       - synchronize
